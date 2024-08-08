@@ -33,12 +33,16 @@ def load_image(image_link):
     if type(image_link) == str:
       if image_link.startswith("http"):
           try:
-              response = requests.get(image_link)
-              img = Image.open(BytesIO(response.content))
+                headers = {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+                }
+                
+                response = requests.get(image_link, headers=headers)
+                img = Image.open(BytesIO(response.content))
           except Exception as e:
-              print(image_link)
-              print(e)
-              return None
+                print(image_link)
+                print(e)
+                return None
       else:
           img = Image.open(image_link)
     elif type(image_link) == np.ndarray:
