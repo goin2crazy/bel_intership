@@ -2,7 +2,7 @@ from config import *
 
 from picker_model import TargetModel
 
-import agrparser
+import argparse
 
 import telebot
 import numpy as np
@@ -13,8 +13,16 @@ from PIL import Image
 cfg = Config
 logs = Logs()
 
-def parse_args(): 
-    ...
+def parse_args():
+    parser = argparse.ArgumentParser(description="Arguments for running the Telegram bot")
+    
+    parser.add_argument('--model', type=str, required=True, help="The name of the model to use, e.g., 'gemini'")
+    parser.add_argument('--gemini-api', type=str, required=True, help="API key for the Gemini model")
+    parser.add_argument('--bot-id', type=str, required=True, help="API key for the Telegram bot")
+    
+    args = parser.parse_args()
+    
+    return args.model, args.gemini_api, args.bot_id
 
 def main(picker, model, link): 
 
