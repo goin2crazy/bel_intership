@@ -26,7 +26,7 @@ def parse_args():
 
 def main(picker, model, link): 
 
-    target_image_link = picker.picker.parse_images_from_page(link)
+    target_image_link = picker.parse_images_from_page(link)
     target_image_link = picker(target_image_link)
     
     return model(target_image_link), target_image_link
