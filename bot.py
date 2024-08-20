@@ -25,8 +25,7 @@ def parse_args():
     return args.model, args.gemini_api, args.bot_id
 
 def main(picker, model, link): 
-
-    target_image_link = picker.parse_images_from_page(link)
+    target_image_link = picker.processor.parse_images_from_page(link)
     target_image_link = picker(target_image_link)
     
     return model(target_image_link), target_image_link
