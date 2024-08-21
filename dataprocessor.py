@@ -108,7 +108,7 @@ class Processor(metaclass=RuntimeMeta):
     def parse_images_from_page(self, page_url):
       image_links = [i for i, _ in  self.get_page_content(page_url) if type(i)==str and (i.startswith("https://auctions.c.yimg.jp/images.auctions.yahoo.co.jp/image/"))]
 
-      return image_links
+      return list(set(image_links))
 
     def take_newest(self, idx=10, *args, **kwargs):
       pages = [f"https://injapan.ru{i}" for _, i in self.get_page_content(cfg.mainpage_url) if i.startswith("/auction/")]
