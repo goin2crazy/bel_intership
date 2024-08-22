@@ -1,12 +1,15 @@
 from config import * 
-
 from picker_model import TargetModel
+from collect_data import collect_links, encode_images
 
 import argparse
+from tqdm.auto import tqdm
 
 import telebot
 import numpy as np
+import pandas as pd 
 import requests
+
 from io import BytesIO
 from PIL import Image
 
@@ -30,25 +33,77 @@ def main(picker, model, link):
     
     return model(target_image_link), target_image_link
 
+
 def bot_setup(bot_api_key, main_fn): 
     bot = telebot.TeleBot(bot_api_key)
 
     @bot.message_handler(func=lambda message: True)
     def echo_message(message):
+        if message.strip().text.startswith("/extra"): 
+            link = message.text.replace("/extra", "").strip() 
 
-        if message.text.startswith("https://injapan.ru/auction/"):
-            bot.reply_to(message, f"Parsing the page...")
+            urls = list() 
+            predicted = list() 
+            predicted_detail_ids = list() 
 
-            label, image_path = main_fn(message.text)
+            all_links = collect_links(link)
+            all_links = list(set(all_links))[:50]
+            bot.reply_to(message, f"Found {len(all_links)} pages...")
 
-            responce = f"""Classification result: {label}"""
-            # Send the classification result as text
-            bot.reply_to(message, responce)
 
-            bot.send_photo(message.chat.id, open(image_path, 'rb'))
+            bot.reply_to(message, f"Trying to find correct image on {len(all_links)} images")
+            
+            for l in tqdm(all_links): 
+                try: 
+                    encoded = encode_images(picker, page_link=l)
+                except Exception as e: 
+                    print(e)
+                    continue
+                urls.append(l)
+                predicted.append(encoded)
 
-        else:
-            bot.reply_to(message, f"Wrong links! links have to start with https://injapan.ru/auction/")
+            bot.reply_to(message, f"Done :)")
+            bot.reply_to(message, f"Trying to find a detail id...")
+
+            for p in predicted: 
+                image_url = "".join([k for k, v in p.items() if v == 1])
+                try: 
+                    predicted_detail_ids.append(model(image_url))
+                except Exception as e: 
+                    print(e)
+                    predicted_detail_ids.append(None)
+
+            bot.reply_to(message, f"Done :). There is the first: {predicted_detail_ids[0]}")
+            dataframe = pd.DataFrame({
+                "url": urls, 
+                "label_1": [" ".join([k for k, v in p.items() if v==1]) for p in predicted], 
+                "label_0": [" ".join([k for k, v in p.items() if v==0]) for p in predicted], 
+                "predicted_detail_id": predicted_detail_ids
+            })
+            # Save DataFrame to Excel
+            excel_path = 'output.xlsx'
+            dataframe.to_excel(excel_path, index=False)
+
+            # Send the Excel file to chat
+            with open(excel_path, 'rb') as file:
+                bot.send_document(message.chat.id, file)
+
+            # Optional: Confirmation message
+            bot.reply_to(message, "Done :). The file has been sent.")
+        else: 
+            if message.text.startswith("https://injapan.ru/auction/"):
+                bot.reply_to(message, f"Parsing the page...")
+
+                label, image_path = main_fn(message.text)
+
+                responce = f"""Classification result: {label}"""
+                # Send the classification result as text
+                bot.reply_to(message, responce)
+
+                bot.send_photo(message.chat.id, open(image_path, 'rb'))
+
+            else:
+                bot.reply_to(message, f"Wrong links! links have to start with https://injapan.ru/auction/")
 
     # and here we actually run it
     bot.polling()

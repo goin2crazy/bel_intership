@@ -8,7 +8,7 @@ from tqdm import tqdm
 # import clear_output 
 from IPython.display import clear_output
 
-def collect_links(t, first_page_link) -> list: 
+def collect_links(t, first_page_link, verbose=0) -> list: 
   prodicts_links = list() 
   for i in range(50): 
     i=i+1
@@ -22,8 +22,9 @@ def collect_links(t, first_page_link) -> list:
     pages = [f"https://injapan.ru{i}" for _, i in t.processor.get_page_content(main_link) if i.startswith("/auction/")]
   
     # checkout the links the clear output 
-    print('\n'.join(pages))
-    clear_output(wait=True)
+    if verbose: 
+      print('\n'.join(pages))
+      clear_output(wait=True)
   
     prodicts_links.extend(pages)
   return prodicts_links
@@ -65,7 +66,7 @@ def main(main_page_link, target_folder_name) -> None :
   products_links = collect_links(t, main_page_link) 
   
   # remove dupblicates 
-  products_links = list(set(prodicts_links))
+  products_links = list(set(products_links))
 
   for i, page_link in tqdm(enumerate(products_links)):
     print(f'page {i+1}/{len(products_links)}')
