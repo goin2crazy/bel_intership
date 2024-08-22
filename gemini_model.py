@@ -8,8 +8,9 @@ from PIL import Image
 import requests
 
 class GeminiInference():
-  def __init__(self, api_key,  model_name = 'gemini-1.5-pro'):
+  def __init__(self, api_key,  model_name = 'gemini-1.5-pro', prompt=None):
     self.gemini_key = api_key
+    self.prompt = prompt
 
     genai.configure(api_key=self.gemini_key)
     generation_config = {
@@ -51,7 +52,7 @@ class GeminiInference():
     ]
     prompt_parts = [
         image_parts[0],
-        """identify Main Catalog Number from photo by this Algorithm
+        ("""identify Main Catalog Number from photo by this Algorithm
 
         
 ### Full Algorithm for Identifying the Catalog Number of a Part from a Photo and Verifying Its Accuracy:
@@ -84,7 +85,7 @@ class GeminiInference():
    - **Absence of Third-Party Logos:** Ensure that the number you believe to be the catalog number is not accompanied by a third-party manufacturer's logo (if it is supposed to be an original VAG number).
    - **Logical Placement:** The catalog number is usually placed in a prominent location or on the main part of the label, making it easier to identify.
    - **Clarification:** Focus on the number in the main location (often near the brand's logo) as the primary catalog number and treat additional codes as supplementary, ensuring they don't replace the main number.
-""",
+""" if self.prompt==None else self.prompt),
     ]
     response = self.model.generate_content(prompt_parts)
     return response.text
