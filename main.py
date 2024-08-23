@@ -27,6 +27,7 @@ def parse_args():
     parser.add_argument('--gemini-api-model', type=str, default='gemini-1.5-pro', required=False, help="Gemini model u going to use")
     parser.add_argument('--prompt', type=str, default=None, required=False, help="source to txt file write prompt written inside")
     parser.add_argument('--first-page-link', type=str, default='https://injapan.ru/category/2084017018/currency-USD/mode-1/condition-used/page-1/sort-enddate/order-ascending.html', required=False, help="")
+    parser.add_argument('--save-file-name', type=str, default='recognized_data', required=False, help="")
 
     args = parser.parse_args()
     
@@ -48,6 +49,7 @@ def parse_args():
             'gemini_model': args.gemini_api_model, 
             'prompt': prompt, 
             'main_link': args.first_page_link, 
+            'savename': args.save_file_name
          },)
 
 def encode(link:str, 
@@ -108,13 +110,22 @@ if __name__ == "__main__":
         model=model, 
     )
 
-    try: 
-      pd.DataFrame(encoding_result).to_excel("recognized_data.xlxs", index=False)
-    except: 
-      # save in pickle format
-      import pickle
+    import pickle 
 
-      with open('data.pickle', 'wb') as f:
-        pickle.dump(encoding_result, f)
+    # Ensure all values in encoding_result have the same length
+    def fix_length(data, target_length):
+        return [x + [None] * (target_length - len(x)) if len(x) < target_length else x for x in data]
 
+    # Determine the maximum length of the lists in encoding_result
+    max_length = max(len(x) for x in encoding_result)
 
+    # Adjust the lengths of the lists in encoding_result
+    encoding_result_fixed = fix_length(encoding_result, max_length)
+
+    # Save to Excel, fall back to pickle if an error occurs
+    try:
+        pd.DataFrame(encoding_result_fixed).to_excel(f"{addictional_data['savename']}.xlsx", index=False)
+    except Exception as e:
+        print(f"Error saving to Excel: {e}. Saving in pickle format instead.")
+        with open(f'{addictional_data['savename']}.pkl', 'wb') as f:
+            pickle.dump(encoding_result_fixed, f)
