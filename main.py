@@ -63,9 +63,11 @@ def encode(link:str,
             "incorrect_image_links": ", ".join([l for l in page_img_links if l != target_image_link])}
 
 def reduce(main_link:str, 
+           picker:TargetModel, 
            **kwargs
            ): 
-    all_links = collect_links(main_link)
+    all_links = collect_links(picker, 
+                              main_link)
 
     result = {"predicted_number": list(), 
               "url": list(), 
@@ -74,7 +76,7 @@ def reduce(main_link:str,
     
     for page_link in tqdm(all_links):     
         try: 
-            for (k, v) in encode(page_link,**kwargs).items(): 
+            for (k, v) in encode(page_link,picker, **kwargs).items(): 
                 result[k].extend(v)
 
         except Exception as e: 
