@@ -10,7 +10,7 @@ from IPython.display import clear_output
 
 def collect_links(t, first_page_link, verbose=0) -> list: 
   prodicts_links = list() 
-  for i in range(50): 
+  for i in range(1): 
     i=i+1
 
     try: 
