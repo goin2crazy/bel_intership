@@ -8,8 +8,9 @@ from PIL import Image
 import requests
 
 class GeminiInference():
-  def __init__(self, api_key,  model_name = 'gemini-1.5-flash'):
+  def __init__(self, api_key,  model_name = 'gemini-1.5-pro', prompt=None):
     self.gemini_key = api_key
+    self.prompt = prompt
 
     genai.configure(api_key=self.gemini_key)
     generation_config = {
@@ -51,28 +52,40 @@ class GeminiInference():
     ]
     prompt_parts = [
         image_parts[0],
-        """ My grandma has problems with vision, she works in japan machine details fabric, can you please her to figure out the detail main id in this images?
+        ("""identify Main Catalog Number from photo by this Algorithm
 
-There is some hints that my grandma uses for recognize detail number:
-"
-For Example number have to looks like 1A2 345 678 B. The target number id have to include the 4 parts, first three parts is for example "1A2 345 678" (each includes 3 chars) and last part, four part, can include in range from 1 char to 3 char, in this example last part is "B"
+        
+### Full Algorithm for Identifying the Catalog Number of a Part from a Photo and Verifying Its Accuracy:
 
-General:
-- Remember the main prefixes: For example, 1K0 for Volkswagen Golf, A for Mercedes-Benz, 95B for Porsche Macan.
-- Pay attention to letter suffixes: They can indicate different modifications of the same part."
+1. **Identify Potential Numbers on the Photo:**
+   - **Examine All Numbers:** Carefully inspect the image for various numbers and markings.
+   - **Identify Numbers Resembling Catalog Numbers:** Look for numbers with a structured format that includes a combination of digits and letters, often separated into groups (e.g., `1K2 820 015 C`). This format is typical for parts catalog numbers.
+   - **Clarification:** Focus on numbers that fit the standard format (three groups of characters) and avoid mistaking additional characters or version codes (e.g., "H03" or "0012") as part of the primary catalog number. 
 
-Please think about recognizing the detail number id step by step
-Write total detail number at the end
-Please Write the <START> to beginning of number, and <END> to detail number end:
-Your Answer Example have to look like:
+2. **Analyze the Structure of the Numbers:**
+   - **Catalog Numbers (Part Numbers):** These numbers typically consist of 9-10 characters, divided into groups, each carrying specific information:
+     - **First Group:** Indicates the car model or platform (e.g., "1K2" for VW Golf V).
+     - **Second Group:** Describes the type of part (e.g., "820" for air conditioning systems).
+     - **Third Group:** Refers to the version or modification of the part.
+   - **OEM Numbers:** OEM (Original Equipment Manufacturer) numbers may not follow these rules, often start with letters, have a less structured appearance, and may be accompanied by the manufacturer's logo.
+   - **Clarification:** Avoid including version or revision codes (e.g., "H03", "0012") within the primary catalog number unless it's specifically relevant to the core part number format.
 
-"
-{reasoning about correct detail number}
+3. **Determine the Brand by the Numbers:**
+   - **VAG Numbers:** Numbers that follow the Volkswagen Audi Group (VAG) standard adhere to the structure described above. These numbers often do not have logos from third-party manufacturers.
+   - **OEM Numbers:** If the number is accompanied by a third-party manufacturer's logo (e.g., Valeo), and the number does not follow the standard VAG format, it is likely an OEM number.
+   - **Clarification:** Prioritize the identification of the main VAG catalog number (e.g., "4H0 907 801 E") and treat any additional characters (e.g., "0012", "H03") as supplementary information, not as part of the main catalog number.
 
-<START> 1A2 345 678 B <END>
-"
-If you dont any number on image just write <START> None <END>
-        """,
+4. **Verify the Accuracy of the Number:**
+   - **Match with Known Formats:** Compare the identified number with commonly accepted formats for the brand. For example, VAG numbers should adhere to the standard format described above.
+   - **Check Against Catalogs:** If possible, use an official parts catalog to verify the number. Enter the number into the catalog's search system to ensure it corresponds to the correct part.
+   - **Compare with Other Numbers:** If multiple numbers are present on the part, ensure that the number you have identified matches the described format and is the primary catalog number, not the OEM number.
+   - **Clarification:** When comparing numbers, ensure that you separate the core catalog number from any additional version codes or supplementary characters.
+
+5. **Final Check and Marking:**
+   - **Absence of Third-Party Logos:** Ensure that the number you believe to be the catalog number is not accompanied by a third-party manufacturer's logo (if it is supposed to be an original VAG number).
+   - **Logical Placement:** The catalog number is usually placed in a prominent location or on the main part of the label, making it easier to identify.
+   - **Clarification:** Focus on the number in the main location (often near the brand's logo) as the primary catalog number and treat additional codes as supplementary, ensuring they don't replace the main number.
+""" if self.prompt==None else self.prompt),
     ]
     response = self.model.generate_content(prompt_parts)
     return response.text
