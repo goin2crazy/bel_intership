@@ -114,10 +114,10 @@ if __name__ == "__main__":
 
     # Ensure all values in encoding_result have the same length
     def fix_length(data, target_length):
-        return [x + [None] * (target_length - len(x)) if len(x) < target_length else x for x in data]
+        return {k: v[:target_length] for k, v in data.items()}
 
     # Determine the maximum length of the lists in encoding_result
-    max_length = max(len(x) for x in encoding_result)
+    max_length = min(len(x) for x in encoding_result)
 
     # Adjust the lengths of the lists in encoding_result
     encoding_result_fixed = fix_length(encoding_result, max_length)
