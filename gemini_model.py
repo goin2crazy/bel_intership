@@ -110,4 +110,7 @@ class GeminiInference():
         raise FileNotFoundError(f"Could not find image: {img}")
 
       answer = self.get_response(img)
+
+      sleep(5)
       return self.extract_number(answer)
+
