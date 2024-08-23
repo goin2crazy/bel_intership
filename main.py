@@ -127,5 +127,5 @@ if __name__ == "__main__":
         pd.DataFrame(encoding_result_fixed).to_excel(f"{addictional_data['savename']}.xlsx", index=False)
     except Exception as e:
         print(f"Error saving to Excel: {e}. Saving in pickle format instead.")
-        with open(f'{addictional_data['savename']}.pkl', 'wb') as f:
+        with open(f'{addictional_data["savename"]}.pkl', 'wb') as f:
             pickle.dump(encoding_result_fixed, f)
