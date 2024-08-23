@@ -77,11 +77,11 @@ def reduce(main_link:str,
     
     for i, page_link in tqdm(enumerate(all_links)):     
         try: 
-            print(f"Processing {i+1}/{all_links} link")
+            print(f"Processing {i+1}/{len(all_links)} link")
             for (k, v) in encode(page_link,picker, **kwargs).items(): 
                 result[k].extend(v)
 
-            clear_output(wait=True)
+            clear_output(wait=False)
         except Exception as e: 
             print(e)
             break
