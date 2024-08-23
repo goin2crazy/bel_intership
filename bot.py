@@ -34,19 +34,23 @@ def main(picker, model, link):
     return model(target_image_link), target_image_link
 
 
-def bot_setup(bot_api_key, main_fn): 
+def bot_setup(bot_api_key, main_fn, models = None): 
     bot = telebot.TeleBot(bot_api_key)
 
+    
     @bot.message_handler(func=lambda message: True)
     def echo_message(message):
-        if message.strip().text.startswith("/extra"): 
+        if message.text.strip().startswith("/extra"): 
             link = message.text.replace("/extra", "").strip() 
 
+            picker= models['picker'] 
+            model = models['main']
+            
             urls = list() 
             predicted = list() 
             predicted_detail_ids = list() 
 
-            all_links = collect_links(link)
+            all_links = collect_links(picker, link)
             all_links = list(set(all_links))[:50]
             bot.reply_to(message, f"Found {len(all_links)} pages...")
 
@@ -124,9 +128,11 @@ if __name__ == "__main__":
 
     picker = TargetModel()
 
+    models = {"picker": picker, "main": model} 
     # Load model
     bot_setup(
         bot_api_key=bot_id, 
         main_fn = lambda link: main(link=link, picker=picker, model=model), 
+        models = models,         
         )    
     
