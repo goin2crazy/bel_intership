@@ -13,6 +13,7 @@ import requests
 
 from io import BytesIO
 from PIL import Image
+from IPython.display import clear_output
 
 cfg = Config
 logs = Logs()
@@ -74,13 +75,15 @@ def reduce(main_link:str,
             "correct_image_link": list(), 
             "incorrect_image_links": list()}
     
-    for page_link in tqdm(all_links):     
+    for i, page_link in tqdm(enumerate(all_links)):     
         try: 
+            print(f"Processing {i+1}/{all_links} link")
             for (k, v) in encode(page_link,picker, **kwargs).items(): 
                 result[k].extend(v)
 
+            clear_output(wait=True)
         except Exception as e: 
-            print("Encoding Runtime Error:", e)
+            print(e)
             break
 
     return result
@@ -104,4 +107,14 @@ if __name__ == "__main__":
         picker = picker, 
         model=model, 
     )
-    pd.DataFrame(encoding_result).to_excel("recognized_data.xlxs", index=False)
+
+    try: 
+      pd.DataFrame(encoding_result).to_excel("recognized_data.xlxs", index=False)
+    except: 
+      # save in pickle format
+      import pickle
+
+      with open('data.pickle', 'wb') as f:
+        pickle.dump(encoding_result, f)
+
+
