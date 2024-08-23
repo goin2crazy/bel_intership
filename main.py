@@ -1,5 +1,6 @@
 from config import * 
 from picker_model import TargetModel
+from gemini_model import GeminiInference
 from collect_data import collect_links, encode_images
 
 import argparse
@@ -90,8 +91,6 @@ if __name__ == "__main__":
     assert model_name in ['gemini'], "There no available model you lookin for"
 
     if model_name == 'gemini': 
-        from gemini_model import GeminiInference
-
         model = GeminiInference(api_key =gemini_api, model_name =addictional_data['gemini_model'], prompt=addictional_data['prompt'])
     else: 
         model = None 
