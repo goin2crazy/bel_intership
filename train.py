@@ -82,7 +82,7 @@ def run(data_path,
       save_model(model)
   return model
 
-if __name__ == "__main__": if __name__ == "__main__":
+if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Train the model with specified parameters.")
