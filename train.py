@@ -73,7 +73,7 @@ def run(data_path,
     chunk_start = i * chunk_size
     chunk_end = i * chunk_size + chunk_size
     
-    ds = create_dataset(image_links[chunk_start:chunk_end], 
+    ds = create_dataset(img_links[chunk_start:chunk_end], 
                         labels[chunk_start:chunk_end], 
                         batch_size = batch_size)
     model = train_model(model, ds, num_epoch)
