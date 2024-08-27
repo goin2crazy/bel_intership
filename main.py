@@ -76,7 +76,7 @@ def reduce(main_link:str,
            max_steps:int = 3, 
            max_links:int = 90, 
            **kwargs): 
-    all_links = collect_links(picker, main_link, max_steps=max_steps, max_links=max_links)
+    all_links = collect_links(picker, main_link, max_pages=max_steps, max_links=max_links)
 
     result = {"predicted_number": list(), 
               "url": list(), 
