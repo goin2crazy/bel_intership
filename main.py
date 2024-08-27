@@ -60,8 +60,8 @@ def encode(link:str,
     page_img_links = list(set(page_img_links))
     
     target_image_link = picker.do_inference_minimodel(page_img_links)
-    
-    return {"predicted_number": str(model(target_image_link)), 
+    predicted_number = str(model(target_image_link))
+    return {"predicted_number": predicted_number, 
             "url": link, 
             "correct_image_link": target_image_link, 
             "incorrect_image_links": ", ".join([l for l in page_img_links if l != target_image_link])}
@@ -81,7 +81,7 @@ def reduce(main_link:str,
         try: 
             print(f"Processing {i+1}/{len(all_links)} link")
             for (k, v) in encode(page_link,picker, **kwargs).items(): 
-                result[k].extend(v)
+                result[k].append(v)
 
             clear_output(wait=False)
         except Exception as e: 
