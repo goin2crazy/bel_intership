@@ -91,10 +91,7 @@ class GeminiInference():
     return response.text
 
   def extract_number(self, response):
-    try:
-      return response.split('<START>')[1].split('<END>')[0]
-    except:
-      return 'None'
+    return response
 
   def __call__(self, image_path):
 

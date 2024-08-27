@@ -64,8 +64,10 @@ def encode(link:str,
     page_img_links = list(set(page_img_links))
     
     target_image_link = picker.do_inference_minimodel(page_img_links)
-    
-    return {"predicted_number": str(model(target_image_link)), 
+    detail_number = str(model(target_image_link))
+    print("Predicted number id:", detail_number)
+
+    return {"predicted_number": detail_number, 
             "url": link, 
             "correct_image_link": target_image_link, 
             "incorrect_image_links": ", ".join([l for l in page_img_links if l != target_image_link])}
