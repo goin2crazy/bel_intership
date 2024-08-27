@@ -8,7 +8,7 @@ from tqdm.auto import tqdm
 
 import telebot
 import numpy as np
-import pandas as pd 
+import pandas as pd  
 import requests
 
 from io import BytesIO
@@ -127,18 +127,20 @@ if __name__ == "__main__":
     import pickle 
 
     # Ensure all values in encoding_result have the same length
-    def fix_length(data, target_length):
-        return {k: v[:target_length] for k, v in data.items()}
+    # def fix_length(data, target_length):
+    #     return {k: v[:target_length] for k, v in data.items()}
 
+    print('Predicted result shape:', {k: len(v) for k, v in encoding_result.items()})
     # Determine the maximum length of the lists in encoding_result
-    max_length = min(len(x) for x in encoding_result)
+    # max_length = min(len(x) for x in encoding_result)
 
-    # Adjust the lengths of the lists in encoding_result
-    encoding_result_fixed = fix_length(encoding_result, max_length)
+    # # Adjust the lengths of the lists in encoding_result
+    # encoding_result_fixed = fix_length(encoding_result, max_length)
+    # print('Fixed-Predicted result shape:', {k: len(v) for k, v in encoding_result_fixed.items()})
 
     # Save to Excel, fall back to pickle if an error occurs
     try:
-        pd.DataFrame(encoding_result_fixed).to_excel(f"{addictional_data['savename']}.xlsx", index=False)
+        pd.DataFrame(encoding_result).to_excel(f"{addictional_data['savename']}.xlsx", index=False)
     except Exception as e:
         print(f"Error saving to Excel: {e}. Saving in pickle format instead.")
         with open(f'{addictional_data["savename"]}.pkl', 'wb') as f:
