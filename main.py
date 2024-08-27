@@ -144,4 +144,4 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"Error saving to Excel: {e}. Saving in pickle format instead.")
         with open(f'{addictional_data["savename"]}.pkl', 'wb') as f:
-            pickle.dump(encoding_result_fixed, f)
+            pickle.dump(encoding_result, f)
