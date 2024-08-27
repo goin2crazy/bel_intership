@@ -23,11 +23,13 @@ def parse_args():
     
     parser.add_argument('--model', type=str, required=True, help="The name of the model to use, e.g., 'gemini'")
     parser.add_argument('--gemini-api', type=str, required=True, help="API key for the Gemini model")
-
     parser.add_argument('--gemini-api-model', type=str, default='gemini-1.5-pro', required=False, help="Gemini model u going to use")
     parser.add_argument('--prompt', type=str, default=None, required=False, help="source to txt file write prompt written inside")
     parser.add_argument('--first-page-link', type=str, default='https://injapan.ru/category/2084017018/currency-USD/mode-1/condition-used/page-1/sort-enddate/order-ascending.html', required=False, help="")
     parser.add_argument('--save-file-name', type=str, default='recognized_data', required=False, help="")
+    parser.add_argument('--ignore-error', action='store_true', help="Ignore errors and continue processing")
+    parser.add_argument('--max-steps', type=int, default=3, required=False, help="Maximum steps to collect links")
+    parser.add_argument('--max-links', type=int, default=90, required=False, help="Maximum number of links to collect")
 
     args = parser.parse_args()
     
@@ -49,7 +51,10 @@ def parse_args():
             'gemini_model': args.gemini_api_model, 
             'prompt': prompt, 
             'main_link': args.first_page_link, 
-            'savename': args.save_file_name
+            'savename': args.save_file_name,
+            'ignore_error': args.ignore_error,
+            'max_steps': args.max_steps,
+            'max_links': args.max_links
          },)
 
 def encode(link:str, 
@@ -67,10 +72,11 @@ def encode(link:str,
 
 def reduce(main_link:str, 
            picker:TargetModel, 
-           **kwargs
-           ): 
-    all_links = collect_links(picker, 
-                              main_link)
+           ignore_error:bool = False, 
+           max_steps:int = 3, 
+           max_links:int = 90, 
+           **kwargs): 
+    all_links = collect_links(picker, main_link, max_steps=max_steps, max_links=max_links)
 
     result = {"predicted_number": list(), 
               "url": list(), 
@@ -86,7 +92,10 @@ def reduce(main_link:str,
             clear_output(wait=False)
         except Exception as e: 
             print(e)
-            break
+            if ignore_error:
+                continue
+            else:
+                break
 
     return result
 
@@ -107,7 +116,10 @@ if __name__ == "__main__":
     encoding_result = reduce(
         addictional_data['main_link'], 
         picker = picker, 
-        model=model, 
+        model=model,
+        ignore_error=addictional_data['ignore_error'],
+        max_steps=addictional_data['max_steps'],
+        max_links=addictional_data['max_links']
     )
 
     import pickle 

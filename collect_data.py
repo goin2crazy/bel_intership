@@ -8,9 +8,9 @@ from tqdm import tqdm
 # import clear_output 
 from IPython.display import clear_output
 
-def collect_links(t, first_page_link, verbose=0) -> list: 
+def collect_links(t, first_page_link, max_pages = 3, max_links = 90, verbose=0) -> list: 
   prodicts_links = list() 
-  for i in range(1): 
+  for i in range(max_pages): 
     i=i+1
 
     try: 
@@ -27,7 +27,7 @@ def collect_links(t, first_page_link, verbose=0) -> list:
       clear_output(wait=True)
   
     prodicts_links.extend(pages)
-  return prodicts_links
+  return prodicts_links[:max_links]
 
 
 def encode_images(t, page_link): 
