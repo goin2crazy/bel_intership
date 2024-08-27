@@ -87,7 +87,7 @@ def reduce(main_link:str,
         try: 
             print(f"Processing {i+1}/{len(all_links)} link")
             for (k, v) in encode(page_link,picker, **kwargs).items(): 
-                result[k].extend(v)
+                result[k].append(v)
 
             clear_output(wait=False)
         except Exception as e: 
