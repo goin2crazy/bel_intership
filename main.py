@@ -72,24 +72,37 @@ def encode(link:str,
             "correct_image_link": target_image_link, 
             "incorrect_image_links": ", ".join([l for l in page_img_links if l != target_image_link])}
 
+def save_intermediate_results(result, filename):
+    try:
+        pd.DataFrame(result).to_excel(f"{filename}.xlsx", index=False)
+        print(f"Intermediate results saved to {filename}.xlsx")
+    except Exception as e:
+        print(f"Error saving intermediate results to Excel: {e}. Saving in pickle format instead.")
+        with open(f'{filename}.pkl', 'wb') as f:
+            pickle.dump(result, f)
+
 def reduce(main_link:str, 
            picker:TargetModel, 
            ignore_error:bool = False, 
            max_steps:int = 3, 
            max_links:int = 90, 
+           savename:str = 'recognized_data', 
            **kwargs): 
     all_links = collect_links(picker, main_link, max_pages=max_steps, max_links=max_links)
 
     result = {"predicted_number": list(), 
               "url": list(), 
-            "correct_image_link": list(), 
-            "incorrect_image_links": list()}
+              "correct_image_link": list(), 
+              "incorrect_image_links": list()}
     
-    for i, page_link in tqdm(enumerate(all_links)):     
+    for i, page_link in tqdm(enumerate(all_links), total=len(all_links)):     
         try: 
             print(f"Processing {i+1}/{len(all_links)} link")
             for (k, v) in encode(page_link,picker, **kwargs).items(): 
                 result[k].append(v)
+
+            if (i + 1) % 10 == 0:  # Save every 10 iterations
+                save_intermediate_results(result, f"{savename}_part_{i // 10 + 1}")
 
             clear_output(wait=False)
         except Exception as e: 
@@ -121,24 +134,11 @@ if __name__ == "__main__":
         model=model,
         ignore_error=addictional_data['ignore_error'],
         max_steps=addictional_data['max_steps'],
-        max_links=addictional_data['max_links']
+        max_links=addictional_data['max_links'],
+        savename=addictional_data['savename']
     )
 
-    import pickle 
-
-    # Ensure all values in encoding_result have the same length
-    # def fix_length(data, target_length):
-    #     return {k: v[:target_length] for k, v in data.items()}
-
-    print('Predicted result shape:', {k: len(v) for k, v in encoding_result.items()})
-    # Determine the maximum length of the lists in encoding_result
-    # max_length = min(len(x) for x in encoding_result)
-
-    # # Adjust the lengths of the lists in encoding_result
-    # encoding_result_fixed = fix_length(encoding_result, max_length)
-    # print('Fixed-Predicted result shape:', {k: len(v) for k, v in encoding_result_fixed.items()})
-
-    # Save to Excel, fall back to pickle if an error occurs
+    # Save final results
     try:
         pd.DataFrame(encoding_result).to_excel(f"{addictional_data['savename']}.xlsx", index=False)
     except Exception as e:
