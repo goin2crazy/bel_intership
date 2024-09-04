@@ -54,8 +54,8 @@ class GeminiInference():
         image_parts[0],
         ("""identify Main Catalog Number from photo by this Algorithm
 
-        
-### Full Algorithm for Identifying the Catalog Number of a Part from a Photo and Verifying Its Accuracy:
+
+**Note:** This algorithm is specifically designed to identify and verify VAG part numbers. Assume all part numbers belong to VAG by default.
 
 1. **Identify Potential Numbers on the Photo:**
    - **Examine All Numbers:** Carefully inspect the image for various numbers and markings.
@@ -85,13 +85,22 @@ class GeminiInference():
    - **Absence of Third-Party Logos:** Ensure that the number you believe to be the catalog number is not accompanied by a third-party manufacturer's logo (if it is supposed to be an original VAG number).
    - **Logical Placement:** The catalog number is usually placed in a prominent location or on the main part of the label, making it easier to identify.
    - **Clarification:** Focus on the number in the main location (often near the brand's logo) as the primary catalog number and treat additional codes as supplementary, ensuring they don't replace the main number.
+
+
+
+
+Please follow the above steps to recognize the correct detail number and format the response as follows:
+
+**Response Format:**
+- If a part number is identified: `<START> [Toyota Part Number] <END>`
+- If no valid number is identified: `<START> NONE <END>`
 """ if self.prompt==None else self.prompt),
     ]
     response = self.model.generate_content(prompt_parts)
     return response.text
 
   def extract_number(self, response):
-    return response
+    return response.split('<START>')[-1].split("<END>")[0] 
 
   def __call__(self, image_path):
 
