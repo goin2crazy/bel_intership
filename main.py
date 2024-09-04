@@ -96,7 +96,8 @@ def reduce(main_link:str,
            savename:str = 'recognized_data', 
            **kwargs): 
     all_links = collect_links(picker, main_link, max_pages=max_steps, max_links=max_links)
-
+    all_links = list(set(all_links))
+               
     result = {"predicted_number": list(), 
               "url": list(), 
               "correct_image_link": list(), 
