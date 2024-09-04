@@ -65,6 +65,13 @@ def encode(link:str,
     
     target_image_link = picker.do_inference_minimodel(page_img_links)
     detail_number = str(model(target_image_link))
+               
+    if detail_number.lower().strip() == 'none'.lower(): 
+        print("Detail number not found, trying again...") 
+        page_img_links = [l for l in page_img_links if l != target_image_link] 
+        target_image_link = picker.do_inference_minimodel(page_img_links)
+        detail_number = str(model(target_image_link))
+    
     print("Predicted number id:", detail_number)
 
     return {"predicted_number": detail_number, 
