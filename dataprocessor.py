@@ -88,6 +88,22 @@ class Processor(metaclass=RuntimeMeta):
       else:
           print(f'Failed to retrieve the webpage. Status code: {response.status_code}')
 
+    @staticmethod
+    def load_product_info(url): 
+    # Send a request to fetch the webpage content
+      response = requests.get(url)
+
+      # Check if the request was successful
+      if response.status_code == 200:
+          # Parse the content with BeautifulSoup
+            soup = BeautifulSoup(response.content, 'html.parser')
+        
+            return_data = {} 
+            return_data['price'] = soup.find('span', {'id': 'spanInfoPrice'}).text
+            return return_data
+      else:
+            print(f'Failed to retrieve the webpage. Status code: {response.status_code}')
+
     def build_dataset(self, image_links):
         images = [load_data(image_link) for image_link in tqdm(image_links)]
         images = [img for img in images if img is not None]

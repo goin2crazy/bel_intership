@@ -69,9 +69,9 @@ class TargetModel(metaclass=RuntimeMeta):
     dataset = self.processor(image_links)
     predictions = self.model.predict(dataset)
 
-    predictions = predictions.flatten().numpy().tolist() 
+    predictions = predictions.flatten().tolist() 
     predictions = [{'image_link': l, 'score': p} for l, p in zip(image_links, predictions)]
-    return sorted(predictions, key=lambda i: float(i['score']))
+    return sorted(predictions, key=lambda i: float(i['score']), reverse=True)
 
   def do_inference_minimodel(self, *args, **kwargs):
     results = self.do_inference_return_probs(*args, **kwargs)

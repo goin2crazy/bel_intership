@@ -65,7 +65,6 @@ def encode(link:str,
     page_img_links = list(set(page_img_links))
     
     images_probs = picker.do_inference_return_probs(page_img_links)
-
     for target_image_link, score in [(i['image_link'], i['score']) for i in images_probs]: 
         print(f'Trying to predict on image {target_image_link} with score {score}')
         detail_number = str(model(target_image_link))
@@ -78,8 +77,10 @@ def encode(link:str,
         
     print("Predicted number id:", detail_number)
 
+    parsed_info = picker.processor.load_product_info(link)
     return {"predicted_number": detail_number, 
             "url": link, 
+            "price": parsed_info['price'], 
             "correct_image_link": target_image_link, 
             "incorrect_image_links": ", ".join([l for l in page_img_links if l != target_image_link])}
 
@@ -104,6 +105,7 @@ def reduce(main_link:str,
                
     result = {"predicted_number": list(), 
               "url": list(), 
+              "price": list(), 
               "correct_image_link": list(), 
               "incorrect_image_links": list()}
     
