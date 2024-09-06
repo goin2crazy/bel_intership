@@ -88,8 +88,7 @@ class Processor(metaclass=RuntimeMeta):
       else:
           print(f'Failed to retrieve the webpage. Status code: {response.status_code}')
 
-    @staticmethod
-    def load_product_info(url): 
+    def load_product_info(self, url): 
     # Send a request to fetch the webpage content
       response = requests.get(url)
 
