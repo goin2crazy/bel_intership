@@ -65,13 +65,17 @@ class TargetModel(metaclass=RuntimeMeta):
 
     self.predicted_image_saving_path = "example_prediction.jpg"
 
-  def do_inference_minimodel(self, image_links):
+  def do_inference_return_probs(self, image_links): 
     dataset = self.processor(image_links)
     predictions = self.model.predict(dataset)
 
-    predictions = predictions.flatten()
-    predictions = np.argmax(predictions, axis=-1)
-    return image_links[predictions]
+    predictions = predictions.flatten().numpy().tolist() 
+    predictions = [{'image_link': l, 'score': p} for l, p in zip(image_links, predictions)]
+    return sorted(predictions, key=lambda i: float(i['score']))
+
+  def do_inference_minimodel(self, *args, **kwargs):
+    results = self.do_inference_return_probs(*args, **kwargs)
+    return results[0]['image_link']
 
   def do_inference(self, image_links, *args, **kwargs):
     target_image_link = self.do_inference_minimodel(image_links, *args, **kwargs)

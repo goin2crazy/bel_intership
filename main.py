@@ -9,6 +9,7 @@ from tqdm.auto import tqdm
 import telebot
 import numpy as np
 import pandas as pd  
+import pickle 
 import requests
 
 from io import BytesIO
@@ -63,15 +64,18 @@ def encode(link:str,
     page_img_links = picker.processor.parse_images_from_page(link)
     page_img_links = list(set(page_img_links))
     
-    target_image_link = picker.do_inference_minimodel(page_img_links)
-    detail_number = str(model(target_image_link))
-               
-    if detail_number.lower().strip() == 'none'.lower(): 
-        print("Detail number not found, trying again...") 
-        page_img_links = [l for l in page_img_links if l != target_image_link] 
-        target_image_link = picker.do_inference_minimodel(page_img_links)
+    images_probs = picker.do_inference_return_probs(page_img_links)
+
+    for target_image_link, score in [(i['image_link'], i['score']) for i in images_probs]: 
+        print(f'Trying to predict on image {target_image_link} with score {score}')
         detail_number = str(model(target_image_link))
-    
+                
+        if detail_number.lower().strip() == 'none'.lower(): 
+            print("Detail number not found, trying again...") 
+            continue
+        else: 
+            break
+        
     print("Predicted number id:", detail_number)
 
     return {"predicted_number": detail_number, 
