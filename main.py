@@ -74,6 +74,19 @@ def encode(link:str,
             continue
         else: 
             break
+    
+    if detail_number.lower().strip() == 'none'.lower(): 
+        print("Trying again...")
+        
+        for target_image_link, score in [(i['image_link'], i['score']) for i in images_probs]: 
+            print(f'Trying to predict on image {target_image_link} with score {score}')
+            detail_number = str(model(target_image_link))
+                    
+            if detail_number.lower().strip() == 'none'.lower(): 
+                print("Detail number not found, trying again...") 
+                continue
+            else: 
+                break
         
     print("Predicted number id:", detail_number)
 
